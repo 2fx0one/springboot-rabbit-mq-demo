@@ -6,4 +6,8 @@ spring:
     #开启发送失败返回
     publisher-returns: true
     #开启发送确认
-    publisher-confirms: true
+#    publisher-confirm-type: CORRELATED
+    listener:
+      direct:
+        acknowledge-mode: auto
+        prefetch: 1
