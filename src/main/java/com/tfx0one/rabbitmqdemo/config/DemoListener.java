@@ -165,7 +165,7 @@ public class DemoListener {
     //第一步. 每条消息有自己的TTL，消息最初产生, 是投递在这个队列中的。只投递，不消费该消。
     // 这个队列使用默认的交换机绑定
     public static final String DELAY_QUEUE_PRE_QUEUE_TTL = "DELAY_QUEUE_PRE_QUEUE_TTL.2";
-    public static final Integer DELAY_QUEUE_PRE_QUEUE_TTL_TIME = 5000;
+    public static final Integer DELAY_QUEUE_PRE_QUEUE_TIME = 5000;
 
     //第二步. 消息一旦到期，转发到该DLX，由routing_key 派发到指定的处理队列 等待消费！
     public static final String DEAD_LETTER_PEOCESS_EXCHANGE_2 = "DEAD_LETTER_EXCHANGE.2";
@@ -181,7 +181,7 @@ public class DemoListener {
                 // dead letter携带的routing key
                 .withArgument("x-dead-letter-routing-key", DEAD_LETTER_PROCESS_ROUTING_KEY_2)
                 // 设置队列的过期时间
-                .withArgument("x-message-ttl", DELAY_QUEUE_PRE_QUEUE_TTL_TIME)
+                .withArgument("x-message-ttl", DELAY_QUEUE_PRE_QUEUE_TIME)
                 .build();
     }
 
