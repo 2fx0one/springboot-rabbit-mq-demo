@@ -52,13 +52,27 @@ class RabbitMqDemoApplicationTests {
     }
 
     @Test
-    void test5_dead_letter_exchange () {
+    void test5_dead_letter_exchange_pre_message () {
         System.out.println("5555555");
         //投递到默认交换机上的队列 DELAY_QUEUE_PRE_MESSAGE_TTL 该队列设置的 DLX
+        rabbitTemplate.convertAndSend(DemoListener.DELAY_QUEUE_PRE_MESSAGE_TTL, new DemoVo().setA("cc").setB(5555), message -> {
+            message.getMessageProperties().setExpiration(String.valueOf(5*1000));
+            return message;
+        });
+        System.out.println("TTL_DLX 模式 DEAD_LETTER_PROCESS_QUEUE.1 将延时收到");
         rabbitTemplate.convertAndSend(DemoListener.DELAY_QUEUE_PRE_MESSAGE_TTL, new DemoVo().setA("cc").setB(5555), message -> {
             message.getMessageProperties().setExpiration(String.valueOf(10*1000));
             return message;
         });
         System.out.println("TTL_DLX 模式 DEAD_LETTER_PROCESS_QUEUE.1 将延时收到");
+    }
+
+    @Test
+    void test6_dead_letter_exchange_pre_queue () {
+        System.out.println("66666666");
+        //投递到默认交换机上的队列 DELAY_QUEUE_PRE_MESSAGE_TTL 该队列设置的 DLX
+        rabbitTemplate.convertAndSend(DemoListener.DELAY_QUEUE_PRE_QUEUE_TTL, new DemoVo().setA("cc").setB(6666));
+        System.out.println("TTL_DLX 模式 DEAD_LETTER_PROCESS_QUEUE.1 将延时收到");
+
     }
 }
