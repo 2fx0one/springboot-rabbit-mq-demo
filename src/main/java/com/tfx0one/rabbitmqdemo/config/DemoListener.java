@@ -162,7 +162,7 @@ public class DemoListener {
     /**
      * 这是第二种，队列统一个时间。
      */
-    //第一步. 每条消息有自己的TTL，消息最初产生, 是投递在这个队列中的。只投递，不消费该消。
+    //第一步. 每条消息有自己的TTL，消息最初产生, 是投递在这个队列中的。只投递，不消费该消息。
     // 这个队列使用默认的交换机绑定
     public static final String DELAY_QUEUE_PRE_QUEUE_TTL = "DELAY_QUEUE_PRE_QUEUE_TTL.2";
     public static final Integer DELAY_QUEUE_PRE_QUEUE_TIME = 5000;
@@ -193,7 +193,7 @@ public class DemoListener {
             key = DEAD_LETTER_PROCESS_ROUTING_KEY_2
     ))
     public void delayMessageReceiver2(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
-        log.info("===== 222 延迟队列 消费 每条消息自己的单独设置 " + demoVo.toString());
+        log.info("===== 222 延迟队列 消费 消息的延时取决于队列的设置。 " + demoVo.toString());
         channel.basicAck(deliveryTag, false);
     }
 
