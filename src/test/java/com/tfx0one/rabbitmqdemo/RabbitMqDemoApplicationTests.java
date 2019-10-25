@@ -7,6 +7,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -75,4 +79,17 @@ class RabbitMqDemoApplicationTests {
         System.out.println("TTL_DLX 模式 DEAD_LETTER_PROCESS_QUEUE.1 将延时收到");
 
     }
+//    @Test
+//    void test7() {
+//        IntStream.range(1,11).forEach(i->{
+//            System.out.println("i = " + i);
+//        });
+//        List<String> list = Arrays.asList("1", "2", "3");
+//        Optional<String> reduce = list.stream().reduce((a, b) -> a + b);
+//        System.out.println(reduce.get());
+//        list.parallelStream()
+//                .map(s->s+"1")
+//                .map(Integer::parseInt);
+//
+//    }
 }
