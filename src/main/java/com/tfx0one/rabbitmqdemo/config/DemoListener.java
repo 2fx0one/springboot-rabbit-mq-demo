@@ -154,7 +154,7 @@ public class DemoListener {
             key = DEAD_LETTER_PROCESS_ROUTING_KEY_1
     ))
     public void delayMessageReceiver1(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
-        log.info("===== 111 延迟队列 消费 每条消息自己的单独设置 " + demoVo.toString());
+        log.info("===== 111 延迟队列 消费 每条消息自己的单独设置 若两者都设置，取较小的" + demoVo.toString());
         channel.basicAck(deliveryTag, false);
     }
 
@@ -193,7 +193,7 @@ public class DemoListener {
             key = DEAD_LETTER_PROCESS_ROUTING_KEY_2
     ))
     public void delayMessageReceiver2(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
-        log.info("===== 222 延迟队列 消费 消息的延时取决于队列的设置。 " + demoVo.toString());
+        log.info("===== 222 延迟队列 消费 消息的延时取决于队列的设置。若两者都设置，取较小的 " + demoVo.toString());
         channel.basicAck(deliveryTag, false);
     }
 
