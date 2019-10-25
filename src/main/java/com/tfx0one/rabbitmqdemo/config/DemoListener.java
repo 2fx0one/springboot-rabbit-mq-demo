@@ -3,12 +3,12 @@ package com.tfx0one.rabbitmqdemo.config;
 import com.rabbitmq.client.Channel;
 import com.tfx0one.rabbitmqdemo.DemoVo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +29,13 @@ public class DemoListener {
     public final static String QUEUE_1 = "QUEUE_1";
 
     @RabbitListener(queuesToDeclare = @Queue(QUEUE_1))
-    public void defaultExchange(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
+    public void defaultExchange(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) {
         log.info("===== 1111111111111 receive " + demoVo.toString());
-        channel.basicAck(deliveryTag, true);
+        try {
+            channel.basicAck(deliveryTag, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -103,4 +107,50 @@ public class DemoListener {
     public void fanoutReceiver2(DemoVo demoVo) {
         log.info("===== 44444444444444.2 receive " + demoVo.toString());
     }
+
+
+    /**
+     *  延迟队列的实现。 TTL + DLX
+     *  为消息或者队列设置 TTL（time to live). 也就是过期时间，时间到了，该消息死亡。（三种死亡形式，1。被拒，2.TTL过期，3.队列最大长度）
+     *  如果一个队列设置了Dead Letter Exchange （DLX) 如果到期，重新publish到Deal Letter Exchange 并通过 DLX routing路由到其他队列。
+     *
+     *  这里有个两种设置，如果既配置了消息的TTL，又配置了队列的TTL，那么较小的那个值会被取用。
+     */
+
+    /**
+     * 这是第一种，消息有自己的独立事件。
+    * */
+    //第一步. 每条消息有自己的TTL，消息最初产生, 是投递在这个队列中的。只投递，不消费该消。
+    // 这个队列使用默认的交换机绑定
+    public static final String DELAY_QUEUE_PRE_MESSAGE_TTL = "DELAY_QUEUE_PRE_MESSAGE_TTL.1";
+
+    //第二步. 消息一旦到期，转发到该DLX，由routing_key 派发到指定的处理队列 等待消费！
+    public static final String DEAD_LETTER_PEOCESS_EXCHANGE_1 = "DEAD_LETTER_EXCHANGE.1";
+    public static final String DEAD_LETTER_PROCESS_ROUTING_KEY = "DEAD_LETTER_PROCESS_ROUTING_KEY.1";
+    public static final String DEAD_LETTER_PROCESS_QUEUE = "DEAD_LETTER_PROCESS_QUEUE.1";
+
+    @Bean
+    public org.springframework.amqp.core.Queue delayQueuePerMessageTTL() {
+        //该队列绑定在默认交换机上。投递上来的消息。会带一个过期参数。过期后，会投递到对应的交换机上。
+        return QueueBuilder.durable(DELAY_QUEUE_PRE_MESSAGE_TTL)
+                // DLX，dead letter发送到的exchange
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_PEOCESS_EXCHANGE_1)
+                // dead letter携带的routing key
+                .withArgument("x-dead-letter-routing-key", DEAD_LETTER_PROCESS_ROUTING_KEY)
+                .build();
+    }
+
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(DEAD_LETTER_PROCESS_QUEUE),
+            //消息到期后, 投递到该交换机。并路由到指定队列
+            exchange = @Exchange(DEAD_LETTER_PEOCESS_EXCHANGE_1),
+            key = DEAD_LETTER_PROCESS_ROUTING_KEY
+    ))
+    public void delayMessageReceiver1(DemoVo demoVo) {
+        log.info("===== 延迟队列。1 每条消息自己的单独设置 " + demoVo.toString());
+    }
+
+
+
 }
