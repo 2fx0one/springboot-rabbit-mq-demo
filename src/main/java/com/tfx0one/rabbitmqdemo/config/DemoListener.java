@@ -131,7 +131,7 @@ public class DemoListener {
     public static final String DELAY_QUEUE_PRE_MESSAGE_TTL = "DELAY_QUEUE_PRE_MESSAGE_TTL.1";
 
     //第二步. 消息一旦到期，转发到该DLX，由routing_key 派发到指定的处理队列 等待消费！
-    public static final String DEAD_LETTER_PEOCESS_EXCHANGE_1 = "DEAD_LETTER_EXCHANGE.1";
+    public static final String DEAD_LETTER_PROCESS_EXCHANGE_1 = "DEAD_LETTER_EXCHANGE.1";
     public static final String DEAD_LETTER_PROCESS_ROUTING_KEY_1 = "DEAD_LETTER_PROCESS_ROUTING_KEY.1";
     public static final String DEAD_LETTER_PROCESS_QUEUE_1 = "DEAD_LETTER_PROCESS_QUEUE.1";
 
@@ -140,7 +140,7 @@ public class DemoListener {
         //该队列绑定在默认交换机上。投递上来的消息。会带一个过期参数。过期后，会投递到对应的交换机上。
         return QueueBuilder.durable(DELAY_QUEUE_PRE_MESSAGE_TTL)
                 // DLX，dead letter发送到的exchange
-                .withArgument("x-dead-letter-exchange", DEAD_LETTER_PEOCESS_EXCHANGE_1)
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_PROCESS_EXCHANGE_1)
                 // dead letter携带的routing key
                 .withArgument("x-dead-letter-routing-key", DEAD_LETTER_PROCESS_ROUTING_KEY_1)
                 .build();
@@ -150,7 +150,7 @@ public class DemoListener {
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(DEAD_LETTER_PROCESS_QUEUE_1),
             //消息到期后, 投递到该交换机。并路由到指定队列
-            exchange = @Exchange(DEAD_LETTER_PEOCESS_EXCHANGE_1),
+            exchange = @Exchange(DEAD_LETTER_PROCESS_EXCHANGE_1),
             key = DEAD_LETTER_PROCESS_ROUTING_KEY_1
     ))
     public void delayMessageReceiver1(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
@@ -168,7 +168,7 @@ public class DemoListener {
     public static final Integer DELAY_QUEUE_PRE_QUEUE_TIME = 5000;
 
     //第二步. 消息一旦到期，转发到该DLX，由routing_key 派发到指定的处理队列 等待消费！
-    public static final String DEAD_LETTER_PEOCESS_EXCHANGE_2 = "DEAD_LETTER_EXCHANGE.2";
+    public static final String DEAD_LETTER_PROCESS_EXCHANGE_2 = "DEAD_LETTER_EXCHANGE.2";
     public static final String DEAD_LETTER_PROCESS_ROUTING_KEY_2 = "DEAD_LETTER_PROCESS_ROUTING_KEY.2";
     public static final String DEAD_LETTER_PROCESS_QUEUE_2 = "DEAD_LETTER_PROCESS_QUEUE.2";
 
@@ -177,7 +177,7 @@ public class DemoListener {
         //该队列绑定在默认交换机上。投递上来的消息。会带一个过期参数。过期后，会投递到对应的交换机上。
         return QueueBuilder.durable(DELAY_QUEUE_PRE_QUEUE_TTL)
                 // DLX，dead letter发送到的exchange
-                .withArgument("x-dead-letter-exchange", DEAD_LETTER_PEOCESS_EXCHANGE_2)
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_PROCESS_EXCHANGE_2)
                 // dead letter携带的routing key
                 .withArgument("x-dead-letter-routing-key", DEAD_LETTER_PROCESS_ROUTING_KEY_2)
                 // 设置队列的过期时间
@@ -189,7 +189,7 @@ public class DemoListener {
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(DEAD_LETTER_PROCESS_QUEUE_2),
             //消息到期后, 投递到该交换机。并路由到指定队列
-            exchange = @Exchange(DEAD_LETTER_PEOCESS_EXCHANGE_2),
+            exchange = @Exchange(DEAD_LETTER_PROCESS_EXCHANGE_2),
             key = DEAD_LETTER_PROCESS_ROUTING_KEY_2
     ))
     public void delayMessageReceiver2(DemoVo demoVo, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
